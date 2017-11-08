@@ -4,7 +4,7 @@ This is meant as a non-exhaustive set of tips to writing clean, usable Dockerfil
 
 ### Before you start
 
-It's assumed you're at least a little familiar with Docker's [best practices](https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/) document, especially using [multi-stage builds](https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds).  This is meant not to replace, but augment.  I will reiterate some of these points to point out particularly useful or powerful conventions.
+It's assumed you're at least a little familiar with Docker's [best practices](https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/) document, **especially** using [multi-stage builds](https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds).  This is meant not to replace, but augment.  I will reiterate some of these points to point out particularly useful or powerful conventions.
 
 ## Minimize your layers as much as possible
 
@@ -21,7 +21,7 @@ This is effectively the same as writing `yum install -y wget && wget https://exa
 
 ## Justify commands and packages, use && convention
 
-These two combined massively increase readability and maintainability of Dockerfiles
+These two combined massively increase readability and maintainability of Dockerfiles.  Commands and packages should be justified to the same level of indentation.
 
     WORKDIR /opt/
 
@@ -35,7 +35,7 @@ These two combined massively increase readability and maintainability of Dockerf
     &&  make \
     &&  make install
 
-While scanning through, it's obvious where new commands start and where continuations of commands (such as listings of packages) are.  Also as part of this, every line (except the last) needs to have a backslash to tell Docker to ignore the incoming newline.  This should also be applied to `ENV` variables.
+While scanning through, it's obvious where new commands start and where continuations of commands (such as listings of packages) are.  Also as part of this, every line (except the last) needs to have a backslash to tell Docker to ignore the incoming newline.  This should also be applied to `ENV` variables.  Also, using `&&` instead of `;` or other conventions kills the `docker build` if any of the commands fail.
 
 ## Sort packages alphabetically
 
@@ -91,6 +91,7 @@ This is less Docker-centric but since Docker very often uses Alpine base images,
 Of course, many times you can use multi-stage builds so you don't have to remove the packages to begin with...
 
 ## Multi-Stage builds
+
 Use them.  For reference, here's what a multi-stage build looks like:
 
     FROM golang:1.7.3 as builder
@@ -106,3 +107,7 @@ Use them.  For reference, here's what a multi-stage build looks like:
     CMD ["./app"]
 
 This demonstrates a Go app being built with a specific docker image, then the image is discarded and only the resulting binary is copied into the final image.  This means that the final image size will only be `alpine` plus the `WORKDIR` and the `app`, instead of necessitating basing the image off of `golang:1.7.3`.
+
+## ADD versus COPY
+
+Generally, you should use `COPY` when all you need to do is add files into the container, but it's also important to note `ADD` can extract archives **and** add from remote URLs.  "The best use for ADD is local tar file auto-extraction into the image, as in `ADD rootfs.tar.xz /`" (directly from Docker's best practices).
