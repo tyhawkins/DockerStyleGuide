@@ -110,4 +110,4 @@ This demonstrates a Go app being built with a specific docker image, then the im
 
 ## ADD versus COPY
 
-Generally, you should use `COPY` when all you need to do is add files into the container, but it's also important to note `ADD` can extract archives **and** add from remote URLs.  "The best use for ADD is local tar file auto-extraction into the image, as in `ADD rootfs.tar.xz /`" (directly from Docker's best practices).
+Generally, you should use `COPY` when all you need to do is add files into the container, but it's also important to note `ADD` can extract archives **and** add from remote URLs.  "The best use for ADD is local tar file auto-extraction into the image, as in `ADD rootfs.tar.xz /`" (lifted directly from Docker's best practices).
